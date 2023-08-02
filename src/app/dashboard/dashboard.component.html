@@ -1,0 +1,25 @@
+<mat-drawer-container class="example-container" autosize>
+  
+  <mat-drawer #drawer class="example-sidenav" mode="over">
+    <p>Auto-resizing sidenav</p>
+    <p *ngIf="showFiller">Lorem, ipsum dolor sit amet consectetur.</p>
+  </mat-drawer>
+
+  <div class="example-sidenav-content flex flex-column gap-6">
+    <mat-toolbar color="primary">
+      <button mat-icon-button class="example-icon" aria-label="Example icon-button with menu icon" (click)="drawer.toggle()">
+        <mat-icon>menu</mat-icon>
+      </button>
+      <span class="m-auto">Sistema de gestión de estudiantes</span>
+    </mat-toolbar>
+
+    <main class="p-3 flex-grow-1 flex flex-column gap-6">
+      <app-home></app-home>
+      <app-users></app-users>
+      <p class="text-right">{{ today | date: 'fullDate' }}</p>
+    </main>
+
+  </div>
+
+
+</mat-drawer-container>

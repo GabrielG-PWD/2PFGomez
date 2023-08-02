@@ -1,0 +1,13 @@
+<h2 appTamanoLetra> Administrar estudiantes </h2>
+<div class="flex flex-column gap-6 align-items-center">
+    <button mat-stroked-button type="button" color="basic" (click)="onCreateUser()">
+        <mat-icon>add</mat-icon>
+        Agregar Estudiante
+    </button>
+
+    <app-users-table 
+    [dataSource]="users" 
+    (deleteUser)="onDeleteUser($event)"
+    (editUser)="onEditUser($event)"
+    ></app-users-table>
+</div>
