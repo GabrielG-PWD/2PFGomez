@@ -3,6 +3,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { UserFormDialogComponent } from './components/user-form-dialog/user-form-dialog.component';
 import { User } from './models';
 import { UserService } from './user.service';
+import { NotifierService } from 'src/app/core/services/notifier.service';
+import { Observable, map, tap } from 'rxjs';
 
 
 @Component({
@@ -12,19 +14,29 @@ import { UserService } from './user.service';
 })
 
 export class UsersComponent {
-  public users: User[] = [];
+  public users: Observable<User[]>;
   constructor(
     private matDialog: MatDialog,
-    private userService: UserService
+    private userService: UserService,
+    private notifier: NotifierService
     ) {
+      this.users = this.userService.getUsers().pipe(
+        tap((valorOriginal) => console.log('Valor antes del map', valorOriginal)),
+        map((valorOriginal) => 
+          valorOriginal.map((usuario) =>  ({
+            ...usuario, 
+            name: usuario.name.toUpperCase()
+          }))
+        ),
+        tap((valorMapeado) => console.log('Valor despues del map:', valorMapeado))
+      );
       this.userService.loadUsers();
 
-      this.userService.getUsers().subscribe({
-        next: (v) => {
-          this.users = v;
-          this.userService.sendNotification('Se cargaron los usuarios')
-        }
-      })
+      // this.userService.getUsers().subscribe({
+      //   next: (v) => {
+      //     this.users = v;
+      //   }
+      // })
   }
 
 
@@ -33,7 +45,15 @@ export class UsersComponent {
     dialogRef.afterClosed().subscribe({
       next: (v) => {
         if (v) {
-          this.userService.createUser(v)
+          this.notifier.showSuccess('Se cargaron los usuarios correctamente')
+          this.userService.createUser({
+            id: new Date().getTime(),
+            name: v.name,
+            surname: v.surname,
+            email: v.email,
+            password: v.password,
+            grade: v.grade
+          })
         } else {
           console.log('Se cancelo');
         }
@@ -43,7 +63,7 @@ export class UsersComponent {
 
   onDeleteUser(userToDelete:User):void {
     if (confirm(`¿Está seguro de eliminar a ${userToDelete.name}?`)) {
-      this.users = this.users.filter( u => u.id != userToDelete.id)
+      // this.users = this.users.filter( u => u.id != userToDelete.id)
     }
   }
 
@@ -56,11 +76,11 @@ export class UsersComponent {
     .subscribe({
       next: (userUpdated) => {
         if (userUpdated) {
-          this.users = this.users.map(user => {
-            return user.id === userToEdit.id 
-              ? { ...user, ...userUpdated}
-              : user
-          })
+          // this.users = this.users.map(user => {
+          //   return user.id === userToEdit.id 
+          //     ? { ...user, ...userUpdated}
+          //     : user
+          // })
         }
       }
     })

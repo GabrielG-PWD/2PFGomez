@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { User } from './models';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +13,8 @@ export class UserService {
 
   private subjectUsers$ = new Subject<User[]>();
   private sendNotification$ = new Subject<string>()
-  private users$ = new BehaviorSubject<User[]>([]);
+  private _users$ = new BehaviorSubject<User[]>([]);
+  private users$ = this._users$.asObservable()
   
   constructor() {
     this.sendNotification$.subscribe({
@@ -26,10 +27,10 @@ export class UserService {
   }
 
   loadUsers():void {
-    this.users$.next(this.users)
+    this._users$.next(this.users)
   }
 
-  getUsers(): Subject<User[]> {
+  getUsers(): Observable<User[]> {
     return this.users$;
   }
 
